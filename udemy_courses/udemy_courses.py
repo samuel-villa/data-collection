@@ -31,7 +31,8 @@ params = (
 )
 
 # parsing all 'topic' links into udemy sitemap page
-target_sitemap = "https://www.udemy.com/sitemap/"
+sitemap = "https://www.udemy.com/sitemap/"
+base_url = "https://www.udemy.com"
 
 
 def get_sitemap_soup(target):
@@ -58,18 +59,25 @@ def get_topic_links(bs4_soup):
     return links
 
 
-soup = get_sitemap_soup(target_sitemap)
-topic_links = get_topic_links(soup)
+def get_topic_id(topic_link):
+    """
+    parse the topic url in order to fetch the category id
+    :param topic_link: category url
+    :return: category id
+    """
+    url = base_url + topic_link
+    response = requests.get(url)
+    html = response.text
+    bs4_soup = BeautifulSoup(html, "html.parser")
+    for attribute in bs4_soup.find_all('div'):
+        if attribute.has_attr('data-component-props'):
+            json_part = json.loads(attribute['data-component-props'])
+            return json_part["topic"]["id"]
+    return None
 
 
-
-# categories = soup.find_all("ul")
-# print(categories[1])  # index 1-13
-#
-# for i in categories[1]:
-#     print(i)
-
-
+soup = get_sitemap_soup(sitemap)
+topic_links = get_topic_links(soup)  # len=341
 
 
 """
@@ -90,9 +98,6 @@ if total_page == 1:
 #     print(i)
 # current_page += 1
 """
-
-
-
 
 # # Directly from dictionary
 # with open('json_data.json', 'w') as outfile:
