@@ -1,5 +1,7 @@
 """
 Collecting the full list of Udemy based courses
+
+    * check if links to fetch start with /topic/...
 """
 import requests
 from bs4 import BeautifulSoup
@@ -28,12 +30,46 @@ params = (
     ('fl', 'lbl'),
 )
 
+# parsing all 'topic' links into udemy sitemap page
 target_sitemap = "https://www.udemy.com/sitemap/"
-response = requests.get(target_sitemap)
-html = response.text
-soup = BeautifulSoup(html, "html.parser")
-categories = soup.find_all("ul")
-print(categories[5].a)
+
+
+def get_sitemap_soup(target):
+    """
+    parse Udemy sitemap page
+    :param target: target page url
+    :return: bs4 object
+    """
+    response = requests.get(target)
+    html = response.text
+    return BeautifulSoup(html, "html.parser")
+
+
+def get_topic_links(bs4_soup):
+    """
+    parse Udemy sitemap page and collect all links ('href') containing the word 'topic'
+    :param bs4_soup: bs4 object
+    :return: list containing all links
+    """
+    links = []
+    for link in bs4_soup.find_all("a"):
+        if '/topic/' in link.get("href"):
+            links.append(link.get("href"))
+    return links
+
+
+soup = get_sitemap_soup(target_sitemap)
+topic_links = get_topic_links(soup)
+
+
+
+# categories = soup.find_all("ul")
+# print(categories[1])  # index 1-13
+#
+# for i in categories[1]:
+#     print(i)
+
+
 
 
 """
