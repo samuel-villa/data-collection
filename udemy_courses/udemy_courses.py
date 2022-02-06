@@ -6,33 +6,11 @@ Collecting the full list of Udemy based courses
 import requests
 from bs4 import BeautifulSoup
 import json
+from datetime import datetime
 
-headers = {
-    'authority': 'www.udemy.com',
-}
-
-params = (
-    ('page_size', '16'),
-    ('subcategory', ''),
-    ('instructional_level', ''),
-    ('lang', ''),
-    ('price', ''),
-    ('duration', ''),
-    ('closed_captions', ''),
-    ('subs_filter_type', ''),
-    ('label_id', '7380'),
-    ('source_page', 'topic_page'),
-    ('locale', 'en_US'),
-    ('currency', 'eur'),
-    ('navigation_locale', 'en_US'),
-    ('skip_price', 'true'),
-    ('sos', 'pl'),
-    ('fl', 'lbl'),
-)
-
-# parsing all 'topic' links into udemy sitemap page
-sitemap = "https://www.udemy.com/sitemap/"
-base_url = "https://www.udemy.com"
+SITEMAP_URL = "https://www.udemy.com/sitemap/"
+BASE_URL = "https://www.udemy.com"
+JSON_FILE = 'udemy_course.json'
 
 
 def get_sitemap_soup(target):
@@ -53,9 +31,9 @@ def get_topic_links(bs4_soup):
     :return: list containing all links
     """
     links = []
-    for link in bs4_soup.find_all("a"):
-        if '/topic/' in link.get("href"):
-            links.append(link.get("href"))
+    for lk in bs4_soup.find_all("a"):
+        if '/topic/' in lk.get("href"):
+            links.append(lk.get("href"))
     return links
 
 
@@ -65,7 +43,7 @@ def get_topic_id(topic_link):
     :param topic_link: category url
     :return: category id
     """
-    url = base_url + topic_link
+    url = BASE_URL + topic_link
     response = requests.get(url)
     html = response.text
     bs4_soup = BeautifulSoup(html, "html.parser")
@@ -76,33 +54,75 @@ def get_topic_id(topic_link):
     return None
 
 
-soup = get_sitemap_soup(sitemap)
+def collect_topic_courses(topic_id):
+    """
+    get all courses items of one given category (topic) and push collected data to json file
+    :param topic_id: courses category id
+    """
+    current_page = 1
+    total_page = 1  # set to 1 before to enter the loop in order to give it the time to be updated within the loop
+    while current_page <= total_page:
+        response = requests.get(f"https://www.udemy.com/api-2.0/discovery-units/all_courses/?closed_captions=&currency"
+                                f"=eur&duration=&fl=lbl&instructional_level=&label_id={topic_id}&lang=&locale=en_US"
+                                f"&navigation_locale=en_US&page_size=60&price=&skip_price=true&sos=pl&source_page"
+                                f"=topic_page&subcategory=&subs_filter_type=&p={current_page}")
+        if response.status_code == 200:
+            html = response.text
+            json_data = json.loads(html)
+            if total_page == 1:  # update total number of pages
+                total_page = json_data['unit']['pagination']['total_page']
+            for i in json_data['unit']['items']:
+                if i["id"] not in courses_ids:  # check for duplicate courses
+                    courses_ids.append(i["id"])
+                    push_data2json(JSON_FILE, i)
+            current_page += 1
+
+
+def init_json_file(json_filename):
+    """
+    create new json file and initialize it with generic empty dictionary
+    """
+    root = {"udemy_courses": []}
+    json_object = json.dumps(root, indent=4)
+    with open(json_filename, "w") as f:
+        f.write(json_object)
+
+
+def push_data2json(filename, data):
+    """
+    append data to existing json file
+    :param filename: json file name
+    :param data: data to be appended
+    """
+    with open(filename, 'r+') as f:
+        file_data = json.load(f)  # load existing data
+        file_data["udemy_courses"].append(data)  # join new_data with file_data inside udemy_courses
+        f.seek(0)  # sets f's current position at offset
+        json.dump(file_data, f, indent=4)  # convert back to json
+
+
+work_start_time = datetime.now()
+soup = get_sitemap_soup(SITEMAP_URL)
 topic_links = get_topic_links(soup)  # len=341
+topic_ids = []
+for link in topic_links[:1]:
+    topic_ids.append(get_topic_id(link))
 
+init_json_file(JSON_FILE)
 
-"""
-# get all courses within one category
-current_page = 1
-total_page = 1  # set to 1 before to enter the loop in order to give it the time to be updated within the loop
-category_id = 7380  # python category example
+courses_ids = []
+for topic in topic_ids:
+    collect_topic_courses(topic)
 
-# while current_page <= total_page:
-response = requests.get(f"https://www.udemy.com/api-2.0/discovery-units/all_courses/?closed_captions=&currency=eur&duration=&fl=lbl&instructional_level=&label_id={category_id}&lang=&locale=en_US&navigation_locale=en_US&page_size=16&price=&skip_price=true&sos=pl&source_page=topic_page&subcategory=&subs_filter_type=&p={current_page}")
-print(response.status_code)
-html = response.text
-json_file = json.loads(html)
-# print(json.dumps(json_file, indent=4))
-if total_page == 1:
-    total_page = json_file['unit']['pagination']['total_page']
-# for i in json_file['unit']['items']:
-#     print(i)
-# current_page += 1
-"""
+work_end_time = datetime.now()
+work_duration = work_end_time - work_start_time
 
-# # Directly from dictionary
-# with open('json_data.json', 'w') as outfile:
-#     json.dump(json_string, outfile)
-#
-# # Using a JSON string
-# with open('json_data.json', 'w') as outfile:
-#     outfile.write(json_string)
+print(len(courses_ids))
+print(work_duration)
+print("\n\n---> Dataset created <---")
+
+# TODO create logfile giving info about: 
+#   - time for the collecting work, 
+#   - len, 
+#   - categories treated, 
+#   - etc
