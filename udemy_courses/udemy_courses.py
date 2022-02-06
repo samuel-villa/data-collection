@@ -117,12 +117,9 @@ for topic in topic_ids:
 work_end_time = datetime.now()
 work_duration = work_end_time - work_start_time
 
-print(len(courses_ids))
-print(work_duration)
-print("\n\n---> Dataset created <---")
+with open("data.log", 'w') as f:
+    f.write("===== Logfile =====\n\n")
+    f.write(f"courses collected: {len(courses_ids)}\n")
+    f.write(f"total work time  : {work_duration}\n")
 
-# TODO create logfile giving info about: 
-#   - time for the collecting work, 
-#   - len, 
-#   - categories treated, 
-#   - etc
+print("\n\n---> Dataset created <---")
