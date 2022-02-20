@@ -10,7 +10,7 @@ from datetime import datetime
 
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
-JSON_FILE = 'udemy_course.json'
+JSON_FILE = 'udemy_courses.json'
 
 
 def get_sitemap_soup(target):
@@ -24,7 +24,7 @@ def get_sitemap_soup(target):
     return BeautifulSoup(html, "html.parser")
 
 
-def get_topic_links(bs4_soup):
+def get_topic_endpoints(bs4_soup):
     """
     parse Udemy sitemap page and collect all links ('href') containing the word 'topic'
     :param bs4_soup: bs4 object
@@ -73,9 +73,18 @@ def collect_topic_courses(topic_id):
                 total_page = json_data['unit']['pagination']['total_page']
             for i in json_data['unit']['items']:
                 if i["id"] not in courses_ids:  # check for duplicate courses
-                    courses_ids.append(i["id"])
+                    courses_ids.append(i["id"])  # only needed to count data
                     push_data2json(JSON_FILE, i)
-            current_page += 1
+        else:
+            print("NO DATA collected for topic ID " + str(topic_id) + " at page: " + str(current_page) +
+                  " --> RESP CODE: " + str(response.status_code) + "\n\n==========================================\n\n")
+            with open("pages_error.log", 'a') as f:
+                f.write("===== NO DATA COLLECTED =====\n\n")
+                f.write(f"topic ID     : {topic_id}\n")
+                f.write(f"page         : {current_page}\n")
+                f.write(f"response code: {response.status_code}\n")
+                f.write("=============================\n\n")
+        current_page += 1
 
 
 def init_json_file(json_filename):
@@ -101,11 +110,13 @@ def push_data2json(filename, data):
         json.dump(file_data, f, indent=4)  # convert back to json
 
 
+# main
 work_start_time = datetime.now()
 soup = get_sitemap_soup(SITEMAP_URL)
-topic_links = get_topic_links(soup)  # len=341
+topic_endpoints = get_topic_endpoints(soup)  # len=341
+topic_endpoints_no_duplicates = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
 topic_ids = []
-for link in topic_links[:1]:
+for link in topic_endpoints_no_duplicates:  # CHANGE HERE FOR TESTING (topic_endpoints_no_duplicates[:1])
     topic_ids.append(get_topic_id(link))
 
 init_json_file(JSON_FILE)
@@ -120,6 +131,6 @@ work_duration = work_end_time - work_start_time
 with open("data.log", 'w') as f:
     f.write("===== Logfile =====\n\n")
     f.write(f"courses collected: {len(courses_ids)}\n")
-    f.write(f"total work time  : {work_duration}\n")
+    f.write(f"total work time  : {work_duration}\n\n")
 
 print("\n\n---> Dataset created <---")
