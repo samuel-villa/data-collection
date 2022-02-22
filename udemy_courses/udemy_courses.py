@@ -12,6 +12,7 @@ Collecting the full list of Udemy based courses
 # TODO merge all categories json files into one global json file
 # TODO setup folders (data)
 """
+import os
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -19,7 +20,9 @@ from datetime import datetime
 
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
-DATA_PATH = "data/"
+DATA_DIR = "data/"
+date_now = datetime.now()  # 2022-02-22 22:22:02.228866
+timestamp = str(date_now).split(".")[0].replace("-", "").replace(" ", "_").replace(":", "")  # 20220222_222202
 
 
 def get_sitemap_soup(target):
@@ -141,7 +144,7 @@ for link in topic_endpoints_no_duplicates:  # CHANGE HERE FOR TESTING (topic_end
 
     topic_id = get_topic_id(link)  # 8322
     topic_name = str(link).split("/")[2]  # "web-development"
-    datafile_name = DATA_PATH + str(topic_id) + "_" + str(topic_name) + ".json"  # 8322_web-development.json
+    datafile_name = DATA_DIR + str(topic_id) + "_" + str(topic_name) + ".json"  # 8322_web-development.json
 
     init_json_file(datafile_name, topic_name)
     print(f"CATEGORY: {topic_name}")
