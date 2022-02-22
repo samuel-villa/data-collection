@@ -1,7 +1,15 @@
 """
 Collecting the full list of Udemy based courses
 
-    * check if links to fetch start with /topic/...
+    * inspect the Udemy sitemap in order to get all categories endpoints (ex. '/web-development/')
+    * for each category link:
+        - inspect the page in order to get the category ID,
+        - insert the category ID in a http request in order to inspect and collect all courses,
+        - push all collected courses data into a json file,
+    * create info log file
+
+# TODO check (and remove) duplicates while collecting the courses
+# TODO merge all categories json files into one global json file
 """
 import requests
 from bs4 import BeautifulSoup
