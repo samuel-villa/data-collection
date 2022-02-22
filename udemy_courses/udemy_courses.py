@@ -10,6 +10,7 @@ Collecting the full list of Udemy based courses
 
 # TODO check (and remove) duplicates while collecting the courses
 # TODO merge all categories json files into one global json file
+# TODO setup folders (data/)
 """
 import requests
 from bs4 import BeautifulSoup
