@@ -12,7 +12,6 @@ Collecting the full list of Udemy based courses
 # TODO merge all categories json files into one global json file
 # TODO setup folders (data)
 """
-import os
 import requests
 from bs4 import BeautifulSoup
 import json
