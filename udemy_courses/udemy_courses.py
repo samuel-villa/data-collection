@@ -8,7 +8,9 @@ Collecting the full list of Udemy based courses
         - push all collected courses data into a json file,
     * create info log file
 
-# TODO merge all categories json files into one global json file
+# TODO zip files
+# TODO set "courses_by_topic" as json file root element
+# TODO readme
 """
 import os
 import requests
@@ -21,6 +23,7 @@ SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
 DATA_DIR = "./data/"
 UDEMY_COURSES_DIR_NAME = "udemy_courses_data/"
+MERGED_COURSES_FILENAME = "udemy_courses_full_list"
 
 # build directories tree
 date_now = datetime.now()  # 2022-02-22 22:22:02.228866
@@ -28,6 +31,7 @@ timestamp = str(date_now).split(".")[0].replace("-", "").replace(" ", "_").repla
 root_path = DATA_DIR + timestamp + "/"  # data/20220222_222202/
 udemy_courses_path = root_path + UDEMY_COURSES_DIR_NAME
 log_filename = root_path + timestamp + ".log"
+merged_courses_file_path = root_path + MERGED_COURSES_FILENAME + ".json"
 
 # create directories if they don't exist
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -114,30 +118,47 @@ def collect_topic_courses(cat_id, json_fn, category_name):
     return courses_cnt
 
 
-def init_json_file(json_filename, category_name):
+def init_json_file(json_filename, root_key):
     """
     create new json file and initialize it with generic empty dictionary
     :param json_filename: JSON file name
-    :param category_name: topic name
+    :param root_key: json root key name
     """
-    root = {category_name: []}
+    root = {root_key: []}
     json_object = json.dumps(root, indent=4)
     with open(json_filename, "w") as file:
         file.write(json_object)
 
 
-def push_data2json(filename, data, category_name):
+def push_data2json(filename, data, root_key):
     """
     append data to existing json file
     :param filename: json file name
     :param data: data to be appended
-    :param category_name: category name
+    :param root_key: category name
     """
     with open(filename, 'r+') as f:
         file_data = json.load(f)  # load existing data
-        file_data[category_name].append(data)  # join new_data with file_data inside udemy_courses
+        file_data[root_key].append(data)  # join new_data with file_data inside udemy_courses
         f.seek(0)  # sets f's current position at offset
         json.dump(file_data, f, indent=4)  # convert back to json
+
+
+def merge_categories2json(new_file, root, cat_dir):
+    """
+    Merge all categories json files into one json file
+    :param new_file: global filename
+    :param root: root key name (bypassed, useless)
+    :param cat_dir: categories json files directory
+    """
+    init_json_file(new_file, root)
+    data = []
+    for jsonfile in os.listdir(cat_dir):
+        json_filepath = cat_dir + jsonfile
+        with open(json_filepath, 'r+') as infile:
+            data.append(json.load(infile))
+        with open(new_file, 'r+') as outfile:
+            json.dump(data, outfile, indent=4)
 
 
 # main
@@ -152,7 +173,7 @@ total_courses = 0
 
 print("============================================================")
 
-for link in unique_topic_endpoints[:1]:  # CHANGE HERE FOR TESTING (unique_topic_endpoints[:1])
+for link in unique_topic_endpoints[12:14]:  # CHANGE HERE FOR TESTING (unique_topic_endpoints[12:14])
 
     topic_id = get_topic_id(link)  # 8322
     topic_name = str(link).split("/")[2]  # "web-development"
@@ -179,11 +200,19 @@ for link in unique_topic_endpoints[:1]:  # CHANGE HERE FOR TESTING (unique_topic
 global_work_end_time = datetime.now()
 global_work_duration = global_work_end_time - global_work_start_time
 
+# merging categories into one global file + calculate work time
+merging_start_time = datetime.now()
+merge_categories2json(merged_courses_file_path, "courses", udemy_courses_path)
+merging_end_time = datetime.now()
+merging_duration = merging_end_time - merging_start_time
+
 with open(log_filename, 'a') as f:
     f.write("====================== TOTAL ======================\n\n")
     f.write(f"Data Collection date: {global_work_start_time}\n")
     f.write(f"Categories collected: {total_categories}\n")
     f.write(f"courses collected   : {total_courses}\n")
-    f.write(f"Total work time     : {global_work_duration}\n")
+    f.write(f"Total work time     : {global_work_duration}\n\n")
+
+    f.write(f"Merge work time     : {merging_duration}\n")
 
 print("\n*** Dataset created ***")
