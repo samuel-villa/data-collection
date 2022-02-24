@@ -8,7 +8,6 @@ Collecting the full list of Udemy based courses
         - push all collected courses data into a json file,
     * create info log file
 
-# TODO check (and remove) duplicates while collecting the courses
 # TODO merge all categories json files into one global json file
 """
 import os
@@ -76,40 +75,43 @@ def get_topic_id(topic_link):
     return None
 
 
-def collect_topic_courses(topic_id, json_filename, category_name):
+def collect_topic_courses(cat_id, json_fn, category_name):
     """
     get all courses items of one given category (topic) and push collected data to json file
-    :param topic_id: courses category id
+    :param category_name: category name
+    :param json_fn: json filename
+    :param cat_id: courses category id
     """
     current_page = 1
     total_page = 1  # set to 1 before to enter the loop in order to give it the time to be updated within the loop
-    courses_count = 0
+    courses_cnt = 0
+    courses_ids = []
     while current_page <= total_page:
         response = requests.get(f"https://www.udemy.com/api-2.0/discovery-units/all_courses/?closed_captions=&currency"
-                                f"=eur&duration=&fl=lbl&instructional_level=&label_id={topic_id}&lang=&locale=en_US"
+                                f"=eur&duration=&fl=lbl&instructional_level=&label_id={cat_id}&lang=&locale=en_US"
                                 f"&navigation_locale=en_US&page_size=60&price=&skip_price=true&sos=pl&source_page"
                                 f"=topic_page&subcategory=&subs_filter_type=&p={current_page}")
         if response.status_code == 200:
             html = response.text
             json_data = json.loads(html)
-            if total_page == 1:  # update total number of pages
+            if total_page == 1:  # get total n° of pages from url and update value initially set to '1'
                 total_page = json_data['unit']['pagination']['total_page']
             for i in json_data['unit']['items']:
-                # if i["id"] not in courses_ids:  # check for duplicate courses
-                #     courses_ids.append(i["id"])  # only needed to count data
-                push_data2json(json_filename, i, category_name)
-                courses_count += 1
+                if i["id"] not in courses_ids:  # check for duplicate courses
+                    courses_ids.append(i["id"])
+                    push_data2json(json_fn, i, category_name)
+                    courses_cnt += 1
         else:
-            print("NO DATA collected for topic ID " + str(topic_id) + " at page: " + str(current_page) +
+            print("NO DATA collected for topic ID " + str(cat_id) + " at page: " + str(current_page) +
                   " --> RESP CODE: " + str(response.status_code) + "\n\n==========================================\n\n")
             with open("pages_error.log", 'a') as f:
                 f.write("===== NO DATA COLLECTED =====\n\n")
-                f.write(f"topic ID     : {topic_id}\n")
+                f.write(f"topic ID     : {cat_id}\n")
                 f.write(f"page         : {current_page}\n")
                 f.write(f"response code: {response.status_code}\n")
                 f.write("=============================\n\n")
         current_page += 1
-    return courses_count
+    return courses_cnt
 
 
 def init_json_file(json_filename, category_name):
@@ -143,14 +145,14 @@ global_work_start_time = datetime.now()
 
 soup = get_sitemap_soup(SITEMAP_URL)
 topic_endpoints = get_topic_endpoints(soup)  # len=341
-topic_endpoints_no_duplicates = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
+unique_topic_endpoints = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
 
 total_categories = 0
 total_courses = 0
 
 print("============================================================")
 
-for link in topic_endpoints_no_duplicates[:1]:  # CHANGE HERE FOR TESTING (topic_endpoints_no_duplicates[:1])
+for link in unique_topic_endpoints[:1]:  # CHANGE HERE FOR TESTING (unique_topic_endpoints[:1])
 
     topic_id = get_topic_id(link)  # 8322
     topic_name = str(link).split("/")[2]  # "web-development"
