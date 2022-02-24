@@ -10,18 +10,29 @@ Collecting the full list of Udemy based courses
 
 # TODO check (and remove) duplicates while collecting the courses
 # TODO merge all categories json files into one global json file
-# TODO setup folders (data)
 """
+import os
 import requests
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
+# constants
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
-DATA_DIR = "data/"
+DATA_DIR = "./data/"
+UDEMY_COURSES_DIR_NAME = "udemy_courses_data/"
+
+# build directories tree
 date_now = datetime.now()  # 2022-02-22 22:22:02.228866
 timestamp = str(date_now).split(".")[0].replace("-", "").replace(" ", "_").replace(":", "")  # 20220222_222202
+root_path = DATA_DIR + timestamp + "/"  # data/20220222_222202/
+udemy_courses_path = root_path + UDEMY_COURSES_DIR_NAME
+log_filename = root_path + timestamp + ".log"
+
+# create directories if they don't exist
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(udemy_courses_path, exist_ok=True)
 
 
 def get_sitemap_soup(target):
@@ -139,23 +150,24 @@ total_courses = 0
 
 print("============================================================")
 
-for link in topic_endpoints_no_duplicates:  # CHANGE HERE FOR TESTING (topic_endpoints_no_duplicates[:1])
+for link in topic_endpoints_no_duplicates[:1]:  # CHANGE HERE FOR TESTING (topic_endpoints_no_duplicates[:1])
 
     topic_id = get_topic_id(link)  # 8322
     topic_name = str(link).split("/")[2]  # "web-development"
-    datafile_name = DATA_DIR + str(topic_id) + "_" + str(topic_name) + ".json"  # 8322_web-development.json
+    data_filename = udemy_courses_path + str(topic_id) + "_" + str(topic_name) + ".json"
+    # data/20220222_222202/udemy_courses_data/8322_web-development.json
 
-    init_json_file(datafile_name, topic_name)
+    init_json_file(data_filename, topic_name)
     print(f"CATEGORY: {topic_name}")
-    print(f"file '{datafile_name}' initialized")
+    print(f"file '{data_filename}' initialized")
     work_start_time = datetime.now()
-    courses_count = collect_topic_courses(topic_id, datafile_name, topic_name)
+    courses_count = collect_topic_courses(topic_id, data_filename, topic_name)
     work_end_time = datetime.now()
     work_duration = work_end_time - work_start_time
     print(f"{courses_count} courses collected in {work_duration}")
     print("============================================================\n")
 
-    with open("data.log", 'a') as f:
+    with open(log_filename, 'a') as f:
         f.write(f"CATEGORY: {topic_name}\n")
         f.write(f"{courses_count} courses collected in {work_duration}\n\n")
 
@@ -165,7 +177,7 @@ for link in topic_endpoints_no_duplicates:  # CHANGE HERE FOR TESTING (topic_end
 global_work_end_time = datetime.now()
 global_work_duration = global_work_end_time - global_work_start_time
 
-with open("data.log", 'a') as f:
+with open(log_filename, 'a') as f:
     f.write("====================== TOTAL ======================\n\n")
     f.write(f"Data Collection date: {global_work_start_time}\n")
     f.write(f"Categories collected: {total_categories}\n")
