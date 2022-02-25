@@ -1,5 +1,6 @@
 # Data Collection Project
-Mix of web scraping programs collecting all kind of data and exporting datasets
+Mix of web scraping programs collecting all kind of data and exporting datasets.
+___
 
 ## Udemy Courses
 The aim of this program is to fetch and collect all courses data present on the Udemy platform.
