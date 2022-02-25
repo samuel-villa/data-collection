@@ -19,6 +19,12 @@ Courses data are organized by category. The folder ```udemy_courses_data``` cont
 The main collection folder ```YYYYMMDD_hhmmss``` contains another global json file (```udemy_courses_full_list.json```) grouping all courses still organized by category and a log file (```YYYYMMDD_hhmmss.log```) providing some information about the collection like the number of categories collected, the number of courses collected, the collection worktime, date and time information, etc.
 
 ### Usage
+First, install dependencies:
 ```
-python3 ./udemy_courses.py
+$ pip install -r requirements.txt
 ```
+Then, run the program:
+```
+$ python3 ./udemy_courses.py
+```
+___
