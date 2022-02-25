@@ -162,58 +162,66 @@ def merge_categories2json(new_file, root, cat_dir):
             json.dump(data, outfile, indent=4)
 
 
-# main
-global_work_start_time = datetime.now()
+def main():
+    """
+    loop through all categories and collect all courses data
+    creates a log file
+    """
+    global_work_start_time = datetime.now()
 
-soup = get_sitemap_soup(SITEMAP_URL)
-topic_endpoints = get_topic_endpoints(soup)  # len=341
-unique_topic_endpoints = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
+    soup = get_sitemap_soup(SITEMAP_URL)
+    topic_endpoints = get_topic_endpoints(soup)  # len=341
+    unique_topic_endpoints = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
 
-total_categories = 0
-total_courses = 0
+    total_categories = 0
+    total_courses = 0
 
-print("============================================================")
+    print("============================================================")
 
-for link in unique_topic_endpoints[12:14]:  # CHANGE HERE FOR TESTING (unique_topic_endpoints[12:14])
+    for link in unique_topic_endpoints[12:14]:  # CHANGE HERE FOR TESTING (unique_topic_endpoints[12:14])
 
-    topic_id = get_topic_id(link)  # 8322
-    topic_name = str(link).split("/")[2]  # "web-development"
-    data_filename = udemy_courses_path + str(topic_id) + "_" + str(topic_name) + ".json"
-    # data/20220222_222202/udemy_courses_data/8322_web-development.json
+        topic_id = get_topic_id(link)  # 8322
+        topic_name = str(link).split("/")[2]  # "web-development"
+        data_filename = udemy_courses_path + str(topic_id) + "_" + str(topic_name) + ".json"
+        # data/20220222_222202/udemy_courses_data/8322_web-development.json
 
-    init_json_file(data_filename, topic_name)
-    print(f"CATEGORY: {topic_name}")
-    print(f"file '{data_filename}' initialized")
-    work_start_time = datetime.now()
-    courses_count = collect_topic_courses(topic_id, data_filename, topic_name)
-    work_end_time = datetime.now()
-    work_duration = work_end_time - work_start_time
-    print(f"{courses_count} courses collected in {work_duration}")
-    print("============================================================\n")
+        init_json_file(data_filename, topic_name)
+        print(f"CATEGORY: {topic_name}")
+        print(f"file '{data_filename}' initialized")
+        work_start_time = datetime.now()
+        courses_count = collect_topic_courses(topic_id, data_filename, topic_name)
+        work_end_time = datetime.now()
+        work_duration = work_end_time - work_start_time
+        print(f"{courses_count} courses collected in {work_duration}")
+        print("============================================================\n")
+
+        with open(log_filename, 'a') as f:
+            f.write(f"CATEGORY: {topic_name}\n")
+            f.write(f"{courses_count} courses collected in {work_duration}\n\n")
+
+        total_categories += 1
+        total_courses += courses_count
+
+    global_work_end_time = datetime.now()
+    global_work_duration = global_work_end_time - global_work_start_time
+
+    # merging categories into one global file + calculate work time
+    merging_start_time = datetime.now()
+    merge_categories2json(merged_courses_file_path, GLOBAL_ROOT_KEY, udemy_courses_path)
+    merging_end_time = datetime.now()
+    merging_duration = merging_end_time - merging_start_time
 
     with open(log_filename, 'a') as f:
-        f.write(f"CATEGORY: {topic_name}\n")
-        f.write(f"{courses_count} courses collected in {work_duration}\n\n")
+        f.write("====================== TOTAL ======================\n\n")
+        f.write(f"Data Collection date: {global_work_start_time}\n")
+        f.write(f"Categories collected: {total_categories}\n")
+        f.write(f"courses collected   : {total_courses}\n")
+        f.write(f"Total work time     : {global_work_duration}\n\n")
 
-    total_categories += 1
-    total_courses += courses_count
+        f.write(f"Merge work time     : {merging_duration}\n")
 
-global_work_end_time = datetime.now()
-global_work_duration = global_work_end_time - global_work_start_time
+    print("*** Dataset created ***")
 
-# merging categories into one global file + calculate work time
-merging_start_time = datetime.now()
-merge_categories2json(merged_courses_file_path, GLOBAL_ROOT_KEY, udemy_courses_path)
-merging_end_time = datetime.now()
-merging_duration = merging_end_time - merging_start_time
 
-with open(log_filename, 'a') as f:
-    f.write("====================== TOTAL ======================\n\n")
-    f.write(f"Data Collection date: {global_work_start_time}\n")
-    f.write(f"Categories collected: {total_categories}\n")
-    f.write(f"courses collected   : {total_courses}\n")
-    f.write(f"Total work time     : {global_work_duration}\n\n")
-
-    f.write(f"Merge work time     : {merging_duration}\n")
-
-print("\n*** Dataset created ***")
+if __name__ == '__main__':
+    main()
