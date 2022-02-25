@@ -6,17 +6,16 @@ Collecting the full list of Udemy based courses
         - inspect the page in order to get the category ID,
         - insert the category ID in a http request in order to inspect and collect all courses,
         - push all collected courses data into a json file,
+    * push all collected categories into a global json file
     * create info log file
-
-# TODO zip files
-# TODO set "courses_by_topic" as json file root element
-# TODO readme
 """
+
 import os
 import requests
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
+
 
 # constants
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
@@ -24,6 +23,7 @@ BASE_URL = "https://www.udemy.com"
 DATA_DIR = "./data/"
 UDEMY_COURSES_DIR_NAME = "udemy_courses_data/"
 MERGED_COURSES_FILENAME = "udemy_courses_full_list"
+GLOBAL_ROOT_KEY = "courses_by_topic"
 
 # build directories tree
 date_now = datetime.now()  # 2022-02-22 22:22:02.228866
@@ -32,6 +32,7 @@ root_path = DATA_DIR + timestamp + "/"  # data/20220222_222202/
 udemy_courses_path = root_path + UDEMY_COURSES_DIR_NAME
 log_filename = root_path + timestamp + ".log"
 merged_courses_file_path = root_path + MERGED_COURSES_FILENAME + ".json"
+zip_file_name = root_path + timestamp
 
 # create directories if they don't exist
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -152,11 +153,11 @@ def merge_categories2json(new_file, root, cat_dir):
     :param cat_dir: categories json files directory
     """
     init_json_file(new_file, root)
-    data = []
+    data = {root: []}
     for jsonfile in os.listdir(cat_dir):
         json_filepath = cat_dir + jsonfile
         with open(json_filepath, 'r+') as infile:
-            data.append(json.load(infile))
+            data[root].append(json.load(infile))
         with open(new_file, 'r+') as outfile:
             json.dump(data, outfile, indent=4)
 
@@ -202,7 +203,7 @@ global_work_duration = global_work_end_time - global_work_start_time
 
 # merging categories into one global file + calculate work time
 merging_start_time = datetime.now()
-merge_categories2json(merged_courses_file_path, "courses", udemy_courses_path)
+merge_categories2json(merged_courses_file_path, GLOBAL_ROOT_KEY, udemy_courses_path)
 merging_end_time = datetime.now()
 merging_duration = merging_end_time - merging_start_time
 
