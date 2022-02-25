@@ -86,6 +86,7 @@ def collect_topic_courses(cat_id, json_fn, category_name):
     :param category_name: category name
     :param json_fn: json filename
     :param cat_id: courses category id
+    :return: number of courses collected
     """
     current_page = 1
     total_page = 1  # set to 1 before to enter the loop in order to give it the time to be updated within the loop
