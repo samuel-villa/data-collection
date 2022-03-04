@@ -11,14 +11,15 @@ import requests
 from datetime import datetime
 
 
-ROOT = "./data_storage/"
+ROOT = "../data_storage/"
 ROOT_CATEGORIES = ROOT + "categories"
 CATEGORIES_LIST_FILE = "categories_list.txt"
 
 
 def create_storage_dir(category, name):
     """
-    Generates data storage directories tree specific to a collector module
+    Generates data storage directories tree specific to a collector module.
+    Ex: '../data_storage/categories/music/piano_courses/20220304_230413/data/'
     :param category: [str] module category
     :param name: [str] module collector name
     :return: full directory path
