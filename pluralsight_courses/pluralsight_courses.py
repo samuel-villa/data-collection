@@ -22,6 +22,10 @@ TODO init json file to store data
 import requests
 import json
 from bs4 import BeautifulSoup
+import collector_tools
+
+CATEGORY = 'education'
+COLLECTOR_DIR_NAME = 'pluralsight_courses'
 
 # sitemap_url = "https://www.pluralsight.com/sitemap.xml"
 # courses_root_url = "https://www.pluralsight.com/courses/"
@@ -45,8 +49,9 @@ testing_links = [
 ]
 
 for lk in testing_links:
-    r = requests.get(lk)
-    soup = BeautifulSoup(r.text, "lxml")
+    # r = requests.get(lk)
+    # soup = BeautifulSoup(r.text, "lxml")
+    soup = collector_tools.get_soup(lk, "lxml")
     prod_id = soup.select('head > meta:nth-child(24)')[0].get('content')
     url = lk
     title = soup.find(id='course-page-hero').find('h1').text
