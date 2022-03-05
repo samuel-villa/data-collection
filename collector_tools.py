@@ -11,6 +11,8 @@ import requests
 from datetime import datetime
 
 
+_ROOT = "./data_storage/"
+_ROOT_CATEGORIES = _ROOT + "categories"
 ROOT = "../data_storage/"
 ROOT_CATEGORIES = ROOT + "categories"
 CATEGORIES_LIST_FILE = "categories_list.txt"
@@ -45,8 +47,7 @@ def create_global_categories_dir_tree(root, cat_file):
             os.makedirs(path, exist_ok=True)
 
 
-# create_global_categories_dir_tree(ROOT_CATEGORIES, CATEGORIES_LIST_FILE)
-# p = create_storage_dir('education', 'pluralsight_courses')
+# create_global_categories_dir_tree(_ROOT_CATEGORIES, CATEGORIES_LIST_FILE)
 
 
 def init_json_file(json_filename, root_key):
@@ -83,5 +84,7 @@ def get_soup(target, parser):
     :return: bs4 object
     """
     response = requests.get(target)
+    if response.status_code != 200:
+        return 'response.status_code: ' + str(response.status_code)
     html = response.text
     return BeautifulSoup(html, parser)
