@@ -5,6 +5,7 @@
 
 """
 import collector_tools
+from datetime import datetime
 
 _CATEGORY = 'education'
 _NAME = 'pluralsight_courses'
@@ -57,6 +58,8 @@ def main():
         'updated_date': '',
     }
 
+    global_work_start_time = datetime.now()
+
     courses_lks = _get_courses_links()  # 13147
     courses_counter = 1
 
@@ -89,6 +92,10 @@ def main():
         collector_tools.push_data2json(js_filename, keys, _NAME)
 
         courses_counter += 1
+
+    global_work_end_time = datetime.now()
+    global_work_duration = global_work_end_time - global_work_start_time
+    print(global_work_duration)
 
 
 if __name__ == '__main__':
