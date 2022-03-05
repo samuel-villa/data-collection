@@ -28,7 +28,8 @@ def get_dir_size(dir_path):
 def create_storage_dir(category, name):
     """
     Generates data storage directories tree specific to a collector module.
-    Ex: '../data_storage/categories/music/piano_courses/20220304_230413/data/'
+    This function should be called from the specific collector module, that's why the path starts with '../'
+        Ex: '../data_storage/categories/music/piano_courses/20220304_230413/data/'
     :param category: [str] module category
     :param name: [str] module collector name
     :return: full directory path
@@ -40,8 +41,10 @@ def create_storage_dir(category, name):
     return data_path
 
 
-def create_global_categories_dir_tree(root, cat_file):
+def _create_global_categories_dir_tree(root, cat_file):
     """
+    FIXME DEPRECATED: create_storage_dir() does the exact same thing without the need to parse an extra txt file listing
+        the categories
     Fetch the given txt file where all categories used within the project are listed and create all corresponding
     directories if they don't exist.
     :param root: [str] data storage categories directories tree root
@@ -50,11 +53,9 @@ def create_global_categories_dir_tree(root, cat_file):
     with open(cat_file) as f:
         for line in f:
             leave = line.strip()
+            print(line)
             path = root + '/' + leave
             os.makedirs(path, exist_ok=True)
-
-
-# create_global_categories_dir_tree(_ROOT_CATEGORIES, CATEGORIES_LIST_FILE)
 
 
 def init_json_file(json_filename, root_key):

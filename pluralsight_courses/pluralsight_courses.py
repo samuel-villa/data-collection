@@ -70,7 +70,7 @@ def main():
     courses_lks = _get_courses_links()  # 13147
     courses_counter = 1
 
-    for lk in courses_lks[:5]:
+    for lk in courses_lks[:3]:
         print(courses_counter, 'working on: ', lk)
         log = f"{courses_counter} - working on: {lk} ... "
         collector_tools.write_log(log_filename, log)
