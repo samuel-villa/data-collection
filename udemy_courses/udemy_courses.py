@@ -16,8 +16,8 @@ from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
-
-# constants
+_CATEGORY = 'education'
+_NAME = 'udemy_courses'
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
 DATA_DIR = "./data/"

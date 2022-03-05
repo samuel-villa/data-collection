@@ -1,8 +1,11 @@
-"""For now the best solution is probably to parse all links and get data from html code values to get: 'prod_id',
-'url', 'title', 'thumbnail', 'description', 'authors', 'authors_about', 'authors_url', 'roles', 'skill_levels',
-'publish_date', 'rating', 'rating_count', 'duration', 'retired', 'updated_date'.
+"""
+Collecting the full list of PluralSight based courses
 
-
+    * inspect the PluralSight sitemap and collect all courses links
+    * inspect each link page html code and fetch data,
+    * store data into dictionary
+    * push dictionary into a json file
+    * create info log file
 """
 import collector_tools
 from datetime import datetime
@@ -31,12 +34,12 @@ def _get_courses_links():
     return list(dict.fromkeys(courses_links))  # remove duplicates if there are
 
 
-testing_links = [
-    "https://www.pluralsight.com/courses/code-first-entity-framework-legacy-databases",
-    "https://www.pluralsight.com/courses/java-unit-testing-junit",  # redirection
-    "https://www.pluralsight.com/courses/querying-converting-data-types-r",
-    "https://www.pluralsight.com/courses/building-features-image-data",
-]
+# testing_links = [
+#     "https://www.pluralsight.com/courses/code-first-entity-framework-legacy-databases",
+#     "https://www.pluralsight.com/courses/java-unit-testing-junit",  # redirection
+#     "https://www.pluralsight.com/courses/querying-converting-data-types-r",
+#     "https://www.pluralsight.com/courses/building-features-image-data",
+# ]
 
 
 def main():
@@ -64,7 +67,7 @@ def main():
     courses_lks = _get_courses_links()  # 13147
     courses_counter = 1
 
-    for lk in testing_links:
+    for lk in courses_lks[:5]:
         print(courses_counter, 'working on: ', lk)
         soup = collector_tools.get_soup(lk)
 
