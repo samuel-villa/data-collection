@@ -214,12 +214,11 @@ def main():
 
     with open(log_filename, 'a') as f:
         f.write("====================== TOTAL ======================\n\n")
-        f.write(f"Data Collection date: {global_work_start_time}\n")
-        f.write(f"Categories collected: {total_categories}\n")
-        f.write(f"courses collected   : {total_courses}\n")
-        f.write(f"Total work time     : {global_work_duration}\n\n")
-
-        f.write(f"Merge work time     : {merging_duration}\n")
+        f.write(f"Date           : {global_work_start_time}\n")
+        f.write(f"Nb. categories : {total_categories}\n")
+        f.write(f"Nb. courses    : {total_courses}\n")
+        f.write(f"Total work time: {global_work_duration}\n\n")
+        f.write(f"Merge work time: {merging_duration}\n")
 
     print("*** Dataset created ***")
 

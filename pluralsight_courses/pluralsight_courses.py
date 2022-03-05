@@ -16,8 +16,11 @@ SITEMAP_URL = "https://www.pluralsight.com/sitemap.xml"
 COURSES_URL = "https://www.pluralsight.com/courses/"
 
 data_path = collector_tools.create_storage_dir(_CATEGORY, _NAME)
-js_filename = data_path + _NAME + '.json'
-collector_tools.init_json_file(js_filename, _NAME)
+json_filename = data_path + _NAME + '.json'
+log_path = data_path.replace('data/', '')
+log_filename = log_path + _NAME + '.log'
+collector_tools.init_json_file(json_filename, _NAME)
+collector_tools.init_log(log_filename)
 
 
 def _get_courses_links():
@@ -31,7 +34,7 @@ def _get_courses_links():
     for link in xml_loc:
         if COURSES_URL in str(link):
             courses_links.append(link.text)
-    return list(dict.fromkeys(courses_links))  # remove duplicates if there are
+    return list(dict.fromkeys(courses_links))  # remove duplicates if any
 
 
 # testing_links = [
@@ -69,6 +72,9 @@ def main():
 
     for lk in courses_lks[:5]:
         print(courses_counter, 'working on: ', lk)
+        log = f"{courses_counter} - working on: {lk} ... "
+        collector_tools.write_log(log_filename, log)
+
         soup = collector_tools.get_soup(lk)
 
         keys = keys.fromkeys(keys)  # reset dict values
@@ -90,13 +96,27 @@ def main():
         keys["retired"] = soup.find("meta", {"name": "retired"}).get('content') if soup.find("meta", {"name": "retired"}) else None
         keys["updated_date"] = soup.find("meta", {"name": "updated-date"}).get('content') if soup.find("meta", {"name": "updated-date"}) else None
 
-        collector_tools.push_data2json(js_filename, keys, _NAME)
+        collector_tools.push_data2json(json_filename, keys, _NAME)
+
+        log = "DONE\n"
+        collector_tools.write_log(log_filename, log)
 
         courses_counter += 1
 
     global_work_end_time = datetime.now()
     global_work_duration = global_work_end_time - global_work_start_time
     print(global_work_duration)
+
+    log = "\n====================== TOTAL ======================\n\n"
+    log_date = f"Date           : {global_work_start_time}\n"
+    log_courses_counter = f"Nb. courses    : {courses_counter - 1}\n"
+    log_total_work_time = f"Total work time: {global_work_duration}\n"
+    log_data_size = f"Data size      : {collector_tools.get_dir_size(data_path)}\n"
+    collector_tools.write_log(log_filename, log)
+    collector_tools.write_log(log_filename, log_date)
+    collector_tools.write_log(log_filename, log_courses_counter)
+    collector_tools.write_log(log_filename, log_total_work_time)
+    collector_tools.write_log(log_filename, log_data_size)
 
 
 if __name__ == '__main__':
