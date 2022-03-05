@@ -76,15 +76,14 @@ def push_data2json(filename, data, root_key):
         json.dump(file_data, f, indent=4)  # convert back to json
 
 
-def get_soup(target, parser):
+def get_soup(target):
     """
     Parse web page
     :param target: [str] target page url
-    :param parser: [str] parser type (html, lxml)
     :return: bs4 object
     """
     response = requests.get(target)
     if response.status_code != 200:
         return 'response.status_code: ' + str(response.status_code)
     html = response.text
-    return BeautifulSoup(html, parser)
+    return BeautifulSoup(html, "lxml")

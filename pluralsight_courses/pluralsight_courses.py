@@ -22,7 +22,7 @@ def _get_courses_links():
     Parse the Pluralsight sitemap url and collect all courses urls
     :return: [list] courses urls
     """
-    sp = collector_tools.get_soup(SITEMAP_URL, "lxml")
+    sp = collector_tools.get_soup(SITEMAP_URL)
     xml_loc = sp.find_all("loc")
     courses_links = []
     for link in xml_loc:
@@ -31,11 +31,12 @@ def _get_courses_links():
     return list(dict.fromkeys(courses_links))  # remove duplicates if there are
 
 
-# testing_links = [
-#     "https://www.pluralsight.com/courses/code-first-entity-framework-legacy-databases",
-#     "https://www.pluralsight.com/courses/querying-converting-data-types-r",
-#     "https://www.pluralsight.com/courses/building-features-image-data"
-# ]
+testing_links = [
+    "https://www.pluralsight.com/courses/code-first-entity-framework-legacy-databases",
+    "https://www.pluralsight.com/courses/java-unit-testing-junit",  # redirection
+    "https://www.pluralsight.com/courses/querying-converting-data-types-r",
+    "https://www.pluralsight.com/courses/building-features-image-data",
+]
 
 
 def main():
@@ -63,31 +64,28 @@ def main():
     courses_lks = _get_courses_links()  # 13147
     courses_counter = 1
 
-    for lk in courses_lks:
+    for lk in testing_links:
         print(courses_counter, 'working on: ', lk)
-        soup = collector_tools.get_soup(lk, "lxml")
+        soup = collector_tools.get_soup(lk)
 
         keys = keys.fromkeys(keys)  # reset dict values
 
-        keys["prod_id"] = soup.find("meta", {"name": "prodId"}).get('content')
+        keys["prod_id"] = soup.find("meta", {"name": "prodId"}).get('content') if soup.find("meta", {"name": "prodId"}) else None
         keys["url"] = lk
-        keys["title"] = soup.find(id='course-page-hero').find('h1').text
-        keys["thumbnail"] = soup.find("meta", {"name": "thumbnail"}).get('content')
-        keys["description"] = soup.find("meta", {"name": "description"}).get('content')
-        keys["authors"] = soup.find("meta", {"name": "authors"}).get('content')
-        is_authors_about = soup.find("div", {"class": "author-item"})
-        keys["authors_about"] = is_authors_about.find("p").text if is_authors_about else is_authors_about
-        keys["authors_url"] = is_authors_about.find('a').get('href') if is_authors_about else is_authors_about
-        keys["roles"] = soup.find("meta", {"name": "roles"}).get('content')
-        keys["skill_levels"] = soup.find("meta", {"name": "skill-levels"}).get('content')
-        keys["publish_date"] = soup.find("meta", {"name": "publish-date"}).get('content')
-        is_rating = soup.find("meta", {"name": "rating"})
-        keys["rating"] = is_rating.get('content') if is_rating else is_rating
-        is_rating_count = soup.find("meta", {"name": "rating-count"})
-        keys["rating_count"] = is_rating_count.get('content') if is_rating_count else is_rating_count
-        keys["duration"] = soup.find("meta", {"name": "duration"}).get('content')
-        keys["retired"] = soup.find("meta", {"name": "retired"}).get('content')
-        keys["updated_date"] = soup.find("meta", {"name": "updated-date"}).get('content')
+        keys["title"] = soup.find(id='course-page-hero').find('h1').text if soup.find(id='course-page-hero') else None
+        keys["thumbnail"] = soup.find("meta", {"name": "thumbnail"}).get('content') if soup.find("meta", {"name": "thumbnail"}) else None
+        keys["description"] = soup.find("meta", {"name": "description"}).get('content') if soup.find("meta", {"name": "description"}) else None
+        keys["authors"] = soup.find("meta", {"name": "authors"}).get('content') if soup.find("meta", {"name": "authors"}) else None
+        keys["authors_about"] = soup.find("div", {"class": "author-item"}).find("p").text if soup.find("div", {"class": "author-item"}) else None
+        keys["authors_url"] = soup.find("div", {"class": "author-item"}).find('a').get('href') if soup.find("div", {"class": "author-item"}) else None
+        keys["roles"] = soup.find("meta", {"name": "roles"}).get('content') if soup.find("meta", {"name": "roles"}) else None
+        keys["skill_levels"] = soup.find("meta", {"name": "skill-levels"}).get('content') if soup.find("meta", {"name": "skill-levels"}) else None
+        keys["publish_date"] = soup.find("meta", {"name": "publish-date"}).get('content') if soup.find("meta", {"name": "publish-date"}) else None
+        keys["rating"] = soup.find("meta", {"name": "rating"}).get('content') if soup.find("meta", {"name": "rating"}) else None
+        keys["rating_count"] = soup.find("meta", {"name": "rating-count"}).get('content') if soup.find("meta", {"name": "rating-count"}) else None
+        keys["duration"] = soup.find("meta", {"name": "duration"}).get('content') if soup.find("meta", {"name": "duration"}) else None
+        keys["retired"] = soup.find("meta", {"name": "retired"}).get('content') if soup.find("meta", {"name": "retired"}) else None
+        keys["updated_date"] = soup.find("meta", {"name": "updated-date"}).get('content') if soup.find("meta", {"name": "updated-date"}) else None
 
         collector_tools.push_data2json(js_filename, keys, _NAME)
 

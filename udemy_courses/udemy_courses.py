@@ -47,7 +47,7 @@ def get_sitemap_soup(target):
     """
     response = requests.get(target)
     html = response.text
-    return BeautifulSoup(html, "html.parser")
+    return BeautifulSoup(html, "lxml")
 
 
 def get_topic_endpoints(bs4_soup):
