@@ -11,7 +11,7 @@ import collector_tools
 from datetime import datetime
 
 _CATEGORY = 'education'
-_NAME = 'pluralsight_courses'
+_NAME = 'pluralsight'
 SITEMAP_URL = "https://www.pluralsight.com/sitemap.xml"
 COURSES_URL = "https://www.pluralsight.com/courses/"
 

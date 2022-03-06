@@ -17,7 +17,7 @@ import json
 from datetime import datetime
 
 _CATEGORY = 'education'
-_NAME = 'udemy_courses'
+_NAME = 'udemy'
 SITEMAP_URL = "https://www.udemy.com/sitemap/"
 BASE_URL = "https://www.udemy.com"
 DATA_DIR = "./data/"
@@ -141,7 +141,7 @@ def push_data2json(filename, data, root_key):
     """
     with open(filename, 'r+') as f:
         file_data = json.load(f)  # load existing data
-        file_data[root_key].append(data)  # join new_data with file_data inside udemy_courses
+        file_data[root_key].append(data)  # join new_data with file_data inside udemy
         f.seek(0)  # sets f's current position at offset
         json.dump(file_data, f, indent=4)  # convert back to json
 
