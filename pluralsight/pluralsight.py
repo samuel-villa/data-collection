@@ -18,6 +18,34 @@ SITEMAP_URL = "https://www.pluralsight.com/sitemap.xml"
 COURSES_URL = "https://www.pluralsight.com/courses/"
 ERROR_URLS_MAX_ATTEMPTS = 3
 
+keys = {
+    'prod_id': '',
+    'url': '',
+    'title': '',
+    'thumbnail': '',
+    'description': '',
+    'authors': '',
+    'authors_about': '',
+    'authors_url': '',
+    'roles': '',
+    'skill_levels': '',
+    'publish_date': '',
+    'rating': '',
+    'rating_count': '',
+    'duration': '',
+    'retired': '',
+    'updated_date': '',
+}
+
+testing_links = [
+    "https://www.pluralsight.com/courses/insights-observations-data-executive-briefing",
+    "https://www.pluralsight.com/courses/your-first-day-rotoscoping-nuke-1217",
+    "https://www.pluralsight.com/courses/inverted-triangle-css-intro",
+    "https://www.pluralsight.com/courses/inverted-triangle-ERROR_TEST",
+    # "https://www.pluralsight.com/courses/java-unit-testing-junit",  # redirection
+    "https://www.pluralsight.com/courses/querying-converting-ERROR_TEST",
+]
+
 data_path = collector_tools.create_storage_dir(_CATEGORY, _NAME)
 json_filename = data_path + _NAME + '.json'
 log_path = data_path.replace('data/', '')
@@ -40,14 +68,15 @@ def _get_courses_links():
     return list(dict.fromkeys(courses_links))  # remove duplicates if any
 
 
-def _scrape_html(url, soup, dict_keys):
+def _scrape_html(url, dict_keys):
     """
     Scrape PluralSight url in order to get specific values
     :param url: [str] PluralSight url to scrape
-    :param soup: BeautifulSoup object
     :param dict_keys: [dict] reset dictionary containing all specific keys we want to scrape
-    :return:
     """
+    soup = collector_tools.get_soup(url)
+    dict_keys = dict_keys.fromkeys(dict_keys)  # reset dict values
+
     dict_keys["prod_id"] = soup.find("meta", {"name": "prodId"}).get('content') if soup.find("meta", {
         "name": "prodId"}) else None
     dict_keys["url"] = url
@@ -63,13 +92,13 @@ def _scrape_html(url, soup, dict_keys):
     dict_keys["authors_url"] = soup.find("div", {"class": "author-item"}).find('a').get('href') if soup.find("div", {
         "class": "author-item"}) else None
     dict_keys["roles"] = soup.find("meta", {"name": "roles"}).get('content') if soup.find("meta",
-                                                                                     {"name": "roles"}) else None
+                                                                                          {"name": "roles"}) else None
     dict_keys["skill_levels"] = soup.find("meta", {"name": "skill-levels"}).get('content') if soup.find("meta", {
         "name": "skill-levels"}) else None
     dict_keys["publish_date"] = soup.find("meta", {"name": "publish-date"}).get('content') if soup.find("meta", {
         "name": "publish-date"}) else None
-    dict_keys["rating"] = soup.find("meta", {"name": "rating"}).get('content') if soup.find("meta",
-                                                                                       {"name": "rating"}) else None
+    dict_keys["rating"] = soup.find("meta", {"name": "rating"}).get('content') if soup.find("meta", {"name": "rating"}) \
+        else None
     dict_keys["rating_count"] = soup.find("meta", {"name": "rating-count"}).get('content') if soup.find("meta", {
         "name": "rating-count"}) else None
     dict_keys["duration"] = soup.find("meta", {"name": "duration"}).get('content') if soup.find("meta", {
@@ -80,35 +109,12 @@ def _scrape_html(url, soup, dict_keys):
         "name": "updated-date"}) else None
 
 
-def main():
-    keys = {
-        'prod_id': '',
-        'url': '',
-        'title': '',
-        'thumbnail': '',
-        'description': '',
-        'authors': '',
-        'authors_about': '',
-        'authors_url': '',
-        'roles': '',
-        'skill_levels': '',
-        'publish_date': '',
-        'rating': '',
-        'rating_count': '',
-        'duration': '',
-        'retired': '',
-        'updated_date': '',
-    }
-
-    testing_links = [
-        "https://www.pluralsight.com/courses/insights-observations-data-executive-briefing",
-        "https://www.pluralsight.com/courses/your-first-day-rotoscoping-nuke-1217",
-        "https://www.pluralsight.com/courses/inverted-triangle-css-intro",
-        "https://www.pluralsight.com/courses/inverted-triangle-ERROR_TEST",
-        # "https://www.pluralsight.com/courses/java-unit-testing-junit",  # redirection
-        "https://www.pluralsight.com/courses/querying-converting-ERROR_TEST",
-    ]
-
+def main(keys_dict):
+    """
+    Main PluralSight scraper
+    Loops on all courses url, collect and store data in a json file
+    :param keys_dict: [dict] keys we want to collect and store
+    """
     global_work_start_time = datetime.now()
     courses_lks = _get_courses_links()  # 13147
     courses_counter = 1
@@ -120,10 +126,8 @@ def main():
         log = f"{courses_counter} - working on: {lk} ... "
         collector_tools.write_log(log_filename, log)
         try:
-            soup = collector_tools.get_soup(lk)
-            keys = keys.fromkeys(keys)  # reset dict values
-            _scrape_html(lk, soup, keys)
-            collector_tools.push_data2json(json_filename, keys, _NAME)
+            _scrape_html(lk, keys_dict)
+            collector_tools.push_data2json(json_filename, keys_dict, _NAME)
             log = "DONE\n"
             collector_tools.write_log(log_filename, log)
         except TypeError:  # if webpage is not loading or the url is not correct a TypeError is raised
@@ -171,10 +175,8 @@ def main():
             log = f"attempt {attempt + 1} - working on: {url} ... "
             collector_tools.write_log(log_filename, log)
             try:
-                soup = collector_tools.get_soup(url)
-                keys = keys.fromkeys(keys)
-                _scrape_html(url, soup, keys)
-                collector_tools.push_data2json(json_filename, keys, _NAME)
+                _scrape_html(url, keys_dict)
+                collector_tools.push_data2json(json_filename, keys_dict, _NAME)
                 log = f"{url} RICOVERED\n"
                 collector_tools.write_log(log_filename, log)
                 error_links.remove(url)
@@ -185,4 +187,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(keys)
