@@ -8,6 +8,8 @@ Collecting the full list of Udemy based courses
         - push all collected courses data into a json file,
     * push all collected categories into a global json file
     * create info log file
+
+TODO make data be stored in the common 'data_storage' folder
 """
 
 import os

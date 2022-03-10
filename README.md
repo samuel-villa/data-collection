@@ -1,5 +1,22 @@
 # Data Collection Project
-Mix of web scraping programs collecting all kind of data and exporting datasets.
+Mix of web scraping programs collecting all kinds of data and exporting datasets.
+All programs (temporarily except 'Udemy') will store the collected data into a common ```data_storage``` directory structured as follows:
+```
+data_storage
+└── categories
+    ├── category_1
+    │   ├── website_1
+    │   │   ├── YYYYMMDD_hhmmss(1)
+    │   │   │   ├── data
+    │   │   │   └── logfile.log
+    │   │   ├── YYYYMMDD_hhmmss(2)
+    │   │   └── ...
+    │   ├── website_2
+    │   └── ...
+    ├── category_2
+    └── ...
+```
+
 ___
 
 ## Udemy Courses
@@ -27,5 +44,20 @@ $ pip install -r requirements.txt
 Then, run the program:
 ```
 $ python3 ./udemy_courses.py
+```
+___
+
+## Pluralsight Courses
+The aim of this program is to fetch and collect all courses data present on the Pluralsight platform. Data key values
+have been chosen arbitrarily and the data scraping is done by fetching each course url html code.
+
+### Usage
+First, install dependencies:
+```
+$ pip install -r requirements.txt
+```
+Then, run the program:
+```
+$ python3 ./pluralsight.py
 ```
 ___
