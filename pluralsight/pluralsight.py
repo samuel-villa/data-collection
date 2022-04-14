@@ -1,5 +1,6 @@
 """
 Collecting the full list of PluralSight based courses
+-> https://www.pluralsight.com/
 
     * inspect the PluralSight sitemap and collect all courses links
     * inspect each link page html code and fetch data,
