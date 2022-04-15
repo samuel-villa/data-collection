@@ -8,6 +8,7 @@ data_storage
     │   ├── website_1
     │   │   ├── YYYYMMDD_hhmmss(1)
     │   │   │   ├── data
+    │   │   │   │   └── data.json                             
     │   │   │   └── logfile.log
     │   │   ├── YYYYMMDD_hhmmss(2)
     │   │   └── ...
