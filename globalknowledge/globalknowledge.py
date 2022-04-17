@@ -76,7 +76,7 @@ def main():
     topic = 1
     while topic <= MAX_TOPIC_ID:
         if get_courses(topic).json()['TotalResults']:
-            print(f"-> collecting courses from category '{courses_categories}' ... ")
+            print(f"-> collecting courses from category '{courses_categories + 1}' ... ")
             courses_categories += 1
             courses = get_courses(topic).json()['Results']
             for course in courses:
