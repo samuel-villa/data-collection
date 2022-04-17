@@ -17,6 +17,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 from datetime import datetime
+import collector_tools
 
 _CATEGORY = 'education'
 _NAME = 'udemy'
@@ -39,30 +40,6 @@ zip_file_name = root_path + timestamp
 # create directories if they don't exist
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(udemy_courses_path, exist_ok=True)
-
-
-def get_sitemap_soup(target):
-    """
-    parse Udemy sitemap page
-    :param target: target page url
-    :return: bs4 object
-    """
-    response = requests.get(target)
-    html = response.text
-    return BeautifulSoup(html, "lxml")
-
-
-def get_topic_endpoints(bs4_soup):
-    """
-    parse Udemy sitemap page and collect all links ('href') containing the word 'topic'
-    :param bs4_soup: bs4 object
-    :return: list containing all links
-    """
-    links = []
-    for lk in bs4_soup.find_all("a"):
-        if '/topic/' in lk.get("href"):
-            links.append(lk.get("href"))
-    return links
 
 
 def get_topic_id(topic_link):
@@ -172,8 +149,8 @@ def main():
     """
     global_work_start_time = datetime.now()
 
-    soup = get_sitemap_soup(SITEMAP_URL)
-    topic_endpoints = get_topic_endpoints(soup)  # len=341
+    soup = collector_tools.get_soup(SITEMAP_URL)
+    topic_endpoints = collector_tools.get_endpoints_containing("/topic/", soup)  # len=341
     unique_topic_endpoints = list(dict.fromkeys(topic_endpoints))  # removing duplicates (len=276)
 
     total_categories = 0

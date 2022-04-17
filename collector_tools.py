@@ -77,6 +77,25 @@ def init_log(log_filename):
     """
     with open(log_filename, 'a') as f:
         f.write("====================== LOGFILE ======================\n\n")
+        
+        
+def init_data_storage_dir(scraper_category, scraper_name):
+    """
+    Initialize data storage directory and files
+    :param scraper_category: [str] main scraper category name
+    :param scraper_name: [str] main scraper name
+    :return: [dict] useful paths
+        - data_path:     ../data_storage/categories/<category>/<scraper_name>/<timeframe>/data/
+        - json_filename: ../data_storage/categories/<category>/<scraper_name>/<timeframe>/data/<scraper_name>.json
+        - log_filename:  ../data_storage/categories/<category>/<scraper_name>/<timeframe>/<scraper_name>.log
+    """
+    data_path = create_storage_dir(scraper_category, scraper_name)
+    json_filename = data_path + scraper_name + '.json'
+    log_path = data_path.replace('data/', '')
+    log_filename = log_path + scraper_name + '.log'
+    init_json_file(json_filename, scraper_name)
+    init_log(log_filename)
+    return {'data_path': data_path, 'json_filename': json_filename, 'log_filename': log_filename}
 
 
 def write_log(log_filename, log_msg):
@@ -114,3 +133,17 @@ def get_soup(target):
         return 'response.status_code: ' + str(response.status_code)
     html = response.text
     return BeautifulSoup(html, "lxml")
+
+
+def get_endpoints_containing(word, bs4_soup):
+    """
+    parse Globalknowledge page, collect all links ('href') containing the given 'word' and remove all duplicates
+    :param word: [str] part of url that the endpoint must contain
+    :param bs4_soup: bs4 object
+    :return: [list] unique links
+    """
+    links = []
+    for lk in bs4_soup.find_all("a"):
+        if word in str(lk.get("href")):
+            links.append(lk.get("href"))
+    return list(dict.fromkeys(links))

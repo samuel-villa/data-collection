@@ -12,18 +12,11 @@ Collecting the full list of Openclassrooms based courses (free and diploma) in f
     * create info log file
 """
 import requests
-import collector_tools
+import collector_tools as ct
 from datetime import datetime
 
 _CATEGORY = 'education'
 _NAME = 'openclassrooms'
-
-data_path = collector_tools.create_storage_dir(_CATEGORY, _NAME)
-json_filename = data_path + _NAME + '.json'
-log_path = data_path.replace('data/', '')
-log_filename = log_path + _NAME + '.log'
-collector_tools.init_json_file(json_filename, _NAME)
-collector_tools.init_log(log_filename)
 
 
 def diploma_courses_fr_post_request():
@@ -154,6 +147,8 @@ def main():
     """
     global_work_start_time = datetime.now()
 
+    files = ct.init_data_storage_dir(_CATEGORY, _NAME)
+
     # get data
     free_fr_courses_data = get_courses_api(free_courses_fr_post_request())
     free_en_courses_data = get_courses_api(free_courses_en_post_request())
@@ -168,10 +163,10 @@ def main():
     courses_count = sum([free_fr_courses_data_count, free_en_courses_data_count, diploma_fr_courses_data_count, diploma_en_courses_data_count])
 
     # push courses data to file
-    collector_tools.push_data2json(json_filename, free_fr_courses_data, _NAME)
-    collector_tools.push_data2json(json_filename, free_en_courses_data, _NAME)
-    collector_tools.push_data2json(json_filename, diploma_fr_courses_data, _NAME)
-    collector_tools.push_data2json(json_filename, diploma_en_courses_data, _NAME)
+    ct.push_data2json(files['json_filename'], free_fr_courses_data, _NAME)
+    ct.push_data2json(files['json_filename'], free_en_courses_data, _NAME)
+    ct.push_data2json(files['json_filename'], diploma_fr_courses_data, _NAME)
+    ct.push_data2json(files['json_filename'], diploma_en_courses_data, _NAME)
 
     # calculate working time
     global_work_end_time = datetime.now()
@@ -185,15 +180,15 @@ def main():
     log_diploma_fr_courses_data_count = f"  - diploma courses (FR): {diploma_fr_courses_data_count}\n"
     log_diploma_en_courses_data_count = f"  - diploma courses (EN): {diploma_en_courses_data_count}\n"
     log_total_work_time = f"Total work time         : {global_work_duration}\n"
-    log_data_size = f"Data size               : {collector_tools.get_dir_size(data_path)}\n\n"
-    collector_tools.write_log(log_filename, log_date)
-    collector_tools.write_log(log_filename, log_courses_counter)
-    collector_tools.write_log(log_filename, log_free_fr_courses_data_count)
-    collector_tools.write_log(log_filename, log_free_en_courses_data_count)
-    collector_tools.write_log(log_filename, log_diploma_fr_courses_data_count)
-    collector_tools.write_log(log_filename, log_diploma_en_courses_data_count)
-    collector_tools.write_log(log_filename, log_total_work_time)
-    collector_tools.write_log(log_filename, log_data_size)
+    log_data_size = f"Data size               : {ct.get_dir_size(files['data_path'])}\n\n"
+    ct.write_log(files['log_filename'], log_date)
+    ct.write_log(files['log_filename'], log_courses_counter)
+    ct.write_log(files['log_filename'], log_free_fr_courses_data_count)
+    ct.write_log(files['log_filename'], log_free_en_courses_data_count)
+    ct.write_log(files['log_filename'], log_diploma_fr_courses_data_count)
+    ct.write_log(files['log_filename'], log_diploma_en_courses_data_count)
+    ct.write_log(files['log_filename'], log_total_work_time)
+    ct.write_log(files['log_filename'], log_data_size)
 
     print(f"\n==> DONE <==\n\n-> COLLECTED {courses_count} courses in {global_work_duration}")
 
