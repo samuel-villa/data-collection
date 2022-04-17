@@ -146,7 +146,6 @@ def main():
     Create log file
     """
     global_work_start_time = datetime.now()
-
     files = ct.init_data_storage_dir(_CATEGORY, _NAME)
 
     # get data

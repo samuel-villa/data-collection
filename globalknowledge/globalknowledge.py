@@ -68,14 +68,13 @@ def main():
     Main GlobalKnowledge scraper
     """
     global_work_start_time = datetime.now()
-    
     files = ct.init_data_storage_dir(_CATEGORY, _NAME)
 
     # get data from API
     courses_data = []
     courses_categories = 0
     topic = 1
-    while topic <= 4:
+    while topic <= MAX_TOPIC_ID:
         if get_courses(topic).json()['TotalResults']:
             courses_categories += 1
             courses = get_courses(topic).json()['Results']

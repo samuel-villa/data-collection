@@ -110,7 +110,6 @@ def main(keys_dict):
     :param keys_dict: [dict] keys we want to collect and store
     """
     global_work_start_time = datetime.now()
-
     files = ct.init_data_storage_dir(_CATEGORY, _NAME)
     
     courses_lks = _get_courses_links()  # 13147
