@@ -87,12 +87,11 @@ def main():
             print(f"---> NO COURSES in category '{courses_categories + 1}' <--- ")
         courses_categories += 1
         topic += 1
-
     print(f"\n{courses_counter} courses collected")
+
     # remove duplicates (one course can belong to more than one category)
     unique_courses_data = {each['Code']: each for each in courses_data}.values()
     print(f"{len(unique_courses_data)} courses left after removing duplicates")
-
 
     # push courses data to file
     for c in unique_courses_data:
