@@ -1,5 +1,6 @@
 """
 Tools needed to store and order data collected via other modules
+TODO improve directories structures (one 'scrapers' folder ?...)
 """
 import json
 import os
@@ -95,7 +96,58 @@ def init_data_storage_dir(scraper_category, scraper_name):
     log_filename = log_path + scraper_name + '.log'
     init_json_file(json_filename, scraper_name)
     init_log(log_filename)
-    return {'data_path': data_path, 'json_filename': json_filename, 'log_filename': log_filename}
+    return {
+        'data_path': data_path,
+        'json_filename': json_filename,
+        'log_filename': log_filename
+    }
+
+
+def init_data_storage_dir_for_categories(scraper_category, scraper_name, categories_dir):
+    """
+    Initialize data storage directory and files.
+    This function is more appropriate 'init_data_storage_dir' for larger amounts of data, where dividing data in
+    categories is more convenient.
+    :param scraper_category: [str] main scraper category name
+    :param scraper_name: [str] main scraper name
+    :param categories_dir: [str] directory name where data divided by categories will be stored
+    :return: [dict] useful paths
+        - data_path:       ../data_storage/categories/<category>/<scraper_name>/<timeframe>/data/
+        - categories_path: ../data_storage/categories/<category>/<scraper_name>/<timeframe>/data/<categories_dir>/
+        - json_filename:   ../data_storage/categories/<category>/<scraper_name>/<timeframe>/data/<scraper_name>.json
+        - log_filename:    ../data_storage/categories/<category>/<scraper_name>/<timeframe>/<scraper_name>.log
+    """
+    data_path = create_storage_dir(scraper_category, scraper_name)
+    json_filename = data_path + scraper_name + '.json'
+    log_path = data_path.replace('data/', '')
+    log_filename = log_path + scraper_name + '.log'
+    init_json_file(json_filename, scraper_name)
+    init_log(log_filename)
+    categories_path = data_path + categories_dir + '/'
+    os.makedirs(categories_path, exist_ok=True)
+    return {
+        'data_path': data_path,
+        'json_filename': json_filename,
+        'log_filename': log_filename,
+        'categories_path': categories_path
+    }
+
+
+def make_single_json_from_categories(unique_json_filepath, root, category_path):
+    """
+    Generate one single json file merging all files present in the 'category_path' folder
+    :param unique_json_filepath: [str] unique json filepath
+    :param root: root key name (scraper name)
+    :param category_path: categories json files directory
+    """
+    init_json_file(unique_json_filepath, root)
+    data = {root: []}
+    for jsonfile in os.listdir(category_path):
+        json_filepath = category_path + jsonfile
+        with open(json_filepath, 'r+') as infile:
+            data[root].append(json.load(infile))
+        with open(unique_json_filepath, 'r+') as outfile:
+            json.dump(data, outfile, indent=4)
 
 
 def write_log(log_filename, log_msg):
