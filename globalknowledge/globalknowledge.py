@@ -74,17 +74,25 @@ def main():
     courses_data = []
     courses_categories = 0
     topic = 1
+    courses_counter = 0
     while topic <= MAX_TOPIC_ID:
-        if get_courses(topic).json()['TotalResults']:
-            print(f"-> collecting courses from category '{courses_categories + 1}' ... ")
-            courses_categories += 1
+        nb_categ_courses = get_courses(topic).json()['TotalResults']
+        if nb_categ_courses:
+            print(f"-> collecting courses from category '{courses_categories + 1}' - {nb_categ_courses} courses")
             courses = get_courses(topic).json()['Results']
+            courses_counter += nb_categ_courses
             for course in courses:
                 courses_data.append(course)
+        else:
+            print(f"---> NO COURSES in category '{courses_categories + 1}' <--- ")
+        courses_categories += 1
         topic += 1
 
+    print(f"\n{courses_counter} courses collected")
     # remove duplicates (one course can belong to more than one category)
     unique_courses_data = {each['Code']: each for each in courses_data}.values()
+    print(f"{len(unique_courses_data)} courses left after removing duplicates")
+
 
     # push courses data to file
     for c in unique_courses_data:
