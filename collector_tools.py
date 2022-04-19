@@ -42,23 +42,6 @@ def create_storage_dir(category, name):
     return data_path
 
 
-def _create_global_categories_dir_tree(root, cat_file):
-    """
-    FIXME DEPRECATED: create_storage_dir() does the exact same thing without the need to parse an extra txt file listing
-        the categories
-    Fetch the given txt file where all categories used within the project are listed and create all corresponding
-    directories if they don't exist.
-    :param root: [str] data storage categories directories tree root
-    :param cat_file: [str] categories list file
-    """
-    with open(cat_file) as f:
-        for line in f:
-            leave = line.strip()
-            print(line)
-            path = root + '/' + leave
-            os.makedirs(path, exist_ok=True)
-
-
 def init_json_file(json_filename, root_key):
     """
     Create new json file and initialize it with generic empty dictionary
