@@ -19,67 +19,34 @@ data_storage
 ```
 
 ___
+## Usage
+First, install dependencies:
+```
+$ pip install -r requirements.txt
+```
+Then, run the program:
+```
+$ python3 ./main.py
+```
+___
+## Currently Implemented Scrapers
 
-## Udemy Courses
+### Udemy Courses
 #### https://www.udemy.com/ 
 The scraper fetches and collects all courses data present on the Udemy platform. Due to the big amount of 
 data available in this website, in addition to get data stored in a single json file, it seemed convenient to also store 
-data into multiple json files organized by category. 
-
-### Usage
-First, install dependencies:
-```
-$ pip install -r requirements.txt
-```
-Then, run the program:
-```
-$ python3 ./udemy_courses.py
-```
+data into multiple json files organized by category.
 ___
-
-## Pluralsight Courses
+### Pluralsight Courses
 #### https://pluralsight.com/
 The scraper fetches and collects all courses data present on the Pluralsight platform. Data key values
 have been chosen arbitrarily and the data scraping is done by fetching each course url html code.
-
-### Usage
-First, install dependencies:
-```
-$ pip install -r requirements.txt
-```
-Then, run the program:
-```
-$ python3 ./pluralsight.py
-```
 ___
-
-## OpenClassrooms
+### OpenClassrooms
 #### https://openclassrooms.com/
 The scraper fetches and collects all courses data present on the Openclassrooms platform. The courses data collected 
-includes all free access courses in English and French as well as all Diploma courses in English and French. 
-
-### Usage
-First, install dependencies:
-```
-$ pip install -r requirements.txt
-```
-Then, run the program:
-```
-$ python3 ./openclassrooms.py
-```
+includes all free access courses in English and French as well as all Diploma courses in English and French.
 ___
-
-## GlobalKnowledge
+### GlobalKnowledge
 #### https://globalknowledge.com/
 The scraper fetches and collects all courses data present on the GlobalKnowledge platform.
-
-### Usage
-First, install dependencies:
-```
-$ pip install -r requirements.txt
-```
-Then, run the program:
-```
-$ python3 ./globalknowledge.py
-```
-___

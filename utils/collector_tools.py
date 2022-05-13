@@ -11,9 +11,9 @@ from datetime import datetime
 
 _ROOT = "./data_storage/"
 _ROOT_CATEGORIES = _ROOT + "categories"
-ROOT = "../../data_storage/"
+ROOT = "data_storage/"
 ROOT_CATEGORIES = ROOT + "categories"
-CATEGORIES_LIST_FILE = "categories_list.txt"
+CATEGORIES_LIST_FILE = "../categories_list.txt"
 
 
 def get_dir_size(dir_path):
@@ -28,8 +28,8 @@ def get_dir_size(dir_path):
 def create_storage_dir(category, name):
     """
     Generates data storage directories tree specific to a collector module.
-    This function must be called from the specific collector module, that's why the path starts with '../../'
-        Ex: '../../data_storage/categories/music/piano_courses/20220304_230413/data/'
+    This function is called from the specific collector module.
+        Ex: 'data_storage/categories/music/piano_courses/20220304_230413/data/'
     :param category: [str] module category
     :param name: [str] module collector name
     :return: full directory path

@@ -12,7 +12,7 @@ Collecting the full list of Openclassrooms based courses (free and diploma) in f
     * create info log file
 """
 import requests
-import collector_tools as ct
+from utils import collector_tools as ct
 from datetime import datetime
 
 _CATEGORY = 'education'
@@ -140,7 +140,7 @@ def get_courses_api(post_response):
     return post_response.json()['results'][0]['hits']
 
 
-def main():
+def run():
     """
     Push data collected into one unique json file
     Create log file
@@ -193,5 +193,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run()
     
