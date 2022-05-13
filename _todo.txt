@@ -1,0 +1,3 @@
+solve < ModuleNotFoundError: No module named 'collector_tools' > bug
+occurs when running scrapers from terminal
+
