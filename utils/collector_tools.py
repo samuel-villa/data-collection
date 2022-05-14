@@ -13,7 +13,6 @@ _ROOT = "./data_storage/"
 _ROOT_CATEGORIES = _ROOT + "categories"
 ROOT = "data_storage/"
 ROOT_CATEGORIES = ROOT + "categories"
-CATEGORIES_LIST_FILE = "../categories_list.txt"
 
 
 def get_dir_size(dir_path):
@@ -171,7 +170,7 @@ def get_soup(target):
 
 def get_endpoints_containing(word, bs4_soup):
     """
-    parse Globalknowledge page, collect all links ('href') containing the given 'word' and remove all duplicates
+    Parse the given bs4 soup object, collect all links ('href') containing the given 'word' and remove all duplicates
     :param word: [str] part of url that the endpoint must contain
     :param bs4_soup: bs4 object
     :return: [list] unique links

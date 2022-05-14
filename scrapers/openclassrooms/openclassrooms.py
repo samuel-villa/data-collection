@@ -12,10 +12,10 @@ Collecting the full list of Openclassrooms based courses (free and diploma) in f
     * create info log file
 """
 import requests
-from utils import collector_tools as ct
+from utils import collector_tools as ct, constants as c
 from datetime import datetime
 
-_CATEGORY = 'education'
+_CATEGORY = c.CATEGORIES['education']
 _NAME = 'openclassrooms'
 
 
