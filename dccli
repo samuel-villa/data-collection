@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 """
 main data collector program
-TODO rearrange modules __init__ imports (=> from scrapers import udemy, openclassrooms, ...)
+TODO convert scrapers modules (.py) in class modules
 TODO implement DB
 """
-from scrapers.openclassrooms import openclassrooms
-from scrapers.globalknowledge import globalknowledge
-from scrapers.pluralsight import pluralsight
-from scrapers.udemy import udemy
+from scrapers import openclassrooms, udemy, pluralsight, globalknowledge
 import utils
 
 # udemy.run()
 # pluralsight.run()
 # globalknowledge.run()
-# openclassrooms.run()
+openclassrooms.run()  # FOR TESTING (fastest)
 
-utils.cli.server()
+# utils.cli.server()

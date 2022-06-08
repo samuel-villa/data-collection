@@ -1,5 +1,5 @@
 CATEGORIES = {
-    'education': 'Education',
+    'education': 'education',
 }
 CLI_CMDS = {
     'scrapers': {
