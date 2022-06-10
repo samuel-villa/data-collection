@@ -2,7 +2,6 @@
 """
 main data collector program
 TODO convert scrapers modules (.py) in class modules
-TODO implement DB
 """
 from scrapers import openclassrooms, udemy, pluralsight, globalknowledge
 import utils

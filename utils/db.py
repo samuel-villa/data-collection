@@ -1,3 +1,6 @@
+"""
+TODO test DB with openclassrooms
+"""
 import psycopg2
 
 # Connect to an existing database
