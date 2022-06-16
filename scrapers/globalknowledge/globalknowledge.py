@@ -8,12 +8,13 @@ Collecting the full list of GlobalKnowledge based courses.
     * push collected data into a json file
     * create info log file
 """
+from scrapers.scraper import Scraper
 import requests
 from datetime import datetime
 from utils import collector_tools as ct, constants as c
 
-_CATEGORY = c.CATEGORIES['education']
-_NAME = 'globalknowledge'
+# _CATEGORY = c.CATEGORIES['education']
+# _NAME = 'globalknowledge'
 
 MAX_TOPIC_ID = 101  # max 101
 
@@ -63,58 +64,62 @@ def get_courses(topic_id):
                         params=params, cookies=cookies)
 
 
-def run():
-    """
-    Main GlobalKnowledge scraper
-    """
-    global_work_start_time = datetime.now()
-    files = ct.init_data_storage_dir(_CATEGORY, _NAME)
+class GlobalKnowledge(Scraper):
+    def __init__(self, name, category):
+        super().__init__(name, category)
 
-    # get data from API
-    courses_data = []
-    courses_categories = 0
-    topic = 1
-    courses_counter = 0
-    while topic <= MAX_TOPIC_ID:
-        nb_categ_courses = get_courses(topic).json()['TotalResults']
-        if nb_categ_courses:
-            print(f"-> collecting courses from category '{courses_categories + 1}' - {nb_categ_courses} courses")
-            courses = get_courses(topic).json()['Results']
-            courses_counter += nb_categ_courses
-            for course in courses:
-                courses_data.append(course)
-        else:
-            print(f"---> NO COURSES in category '{courses_categories + 1}' <--- ")
-        courses_categories += 1
-        topic += 1
-    print(f"\n{courses_counter} courses collected")
+    def run(self):
+        """
+        Main GlobalKnowledge scraper
+        """
+        global_work_start_time = datetime.now()
+        files = ct.init_data_storage_dir(self.category, self.name)
 
-    # remove duplicates (one course can belong to more than one category)
-    unique_courses_data = {each['Code']: each for each in courses_data}.values()
-    print(f"{len(unique_courses_data)} courses left after removing duplicates")
+        # get data from API
+        courses_data = []
+        courses_categories = 0
+        topic = 1
+        courses_counter = 0
+        while topic <= MAX_TOPIC_ID:
+            nb_categ_courses = get_courses(topic).json()['TotalResults']
+            if nb_categ_courses:
+                print(f"-> collecting courses from category '{courses_categories + 1}' - {nb_categ_courses} courses")
+                courses = get_courses(topic).json()['Results']
+                courses_counter += nb_categ_courses
+                for course in courses:
+                    courses_data.append(course)
+            else:
+                print(f"---> NO COURSES in category '{courses_categories + 1}' <--- ")
+            courses_categories += 1
+            topic += 1
+        print(f"\n{courses_counter} courses collected")
 
-    # push courses data to file
-    for c in unique_courses_data:
-        ct.push_data2json(files['json_filename'], c, _NAME)
+        # remove duplicates (one course can belong to more than one category)
+        unique_courses_data = {each['Code']: each for each in courses_data}.values()
+        print(f"{len(unique_courses_data)} courses left after removing duplicates")
 
-    # calculate working time
-    global_work_end_time = datetime.now()
-    global_work_duration = global_work_end_time - global_work_start_time
+        # push courses data to file
+        for c in unique_courses_data:
+            ct.push_data2json(files['json_filename'], c, self.name)
 
-    # logs
-    log_date = f"Date                    : {global_work_start_time}\n"
-    log_courses_counter = f"Total courses           : {len(unique_courses_data)}\n"
-    log_courses_categories = f"Total courses categories: {courses_categories}\n"
-    log_total_work_time = f"Total work time         : {global_work_duration}\n"
-    log_data_size = f"Data size               : {ct.get_dir_size(files['data_path'])}\n\n"
-    ct.write_log(files['log_filename'], log_date)
-    ct.write_log(files['log_filename'], log_courses_counter)
-    ct.write_log(files['log_filename'], log_courses_categories)
-    ct.write_log(files['log_filename'], log_total_work_time)
-    ct.write_log(files['log_filename'], log_data_size)
+        # calculate working time
+        global_work_end_time = datetime.now()
+        global_work_duration = global_work_end_time - global_work_start_time
 
-    print(f"\n==> DONE <==\n\n-> COLLECTED {len(unique_courses_data)} courses in {global_work_duration}")
+        # logs
+        log_date = f"Date                    : {global_work_start_time}\n"
+        log_courses_counter = f"Total courses           : {len(unique_courses_data)}\n"
+        log_courses_categories = f"Total courses categories: {courses_categories}\n"
+        log_total_work_time = f"Total work time         : {global_work_duration}\n"
+        log_data_size = f"Data size               : {ct.get_dir_size(files['data_path'])}\n\n"
+        ct.write_log(files['log_filename'], log_date)
+        ct.write_log(files['log_filename'], log_courses_counter)
+        ct.write_log(files['log_filename'], log_courses_categories)
+        ct.write_log(files['log_filename'], log_total_work_time)
+        ct.write_log(files['log_filename'], log_data_size)
+
+        print(f"\n==> DONE <==\n\n-> COLLECTED {len(unique_courses_data)} courses in {global_work_duration}")
 
 
-if __name__ == '__main__':
-    run()
+# if __name__ == '__main__':
+#     run()

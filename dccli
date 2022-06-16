@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """
 main data collector program
-TODO convert scrapers modules (.py) in class modules
-TODO implement DB
 """
 from scrapers import openclassrooms, udemy, pluralsight, globalknowledge
 import utils
@@ -10,6 +8,8 @@ import utils
 # udemy.run()
 # pluralsight.run()
 # globalknowledge.run()
-openclassrooms.run()  # FOR TESTING (fastest)
+globalknowledge = globalknowledge.GlobalKnowledge('globalknowledge', utils.constants.CATEGORIES['education'])
+globalknowledge.run()
+# openclassrooms.run()  # FOR TESTING (fastest)
 
 # utils.cli.server()
